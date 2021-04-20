@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/assisrafael/gorm"
+	_ "github.com/assisrafael/gorm/dialects/postgres"
 )
 
 type CheckoutCart struct {
