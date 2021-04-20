@@ -122,6 +122,10 @@ func (s commonDialect) HasTable(tableName string) bool {
 	return count > 0
 }
 
+func (s commonDialect) HasSchema(tableName string) bool {
+	return true
+}
+
 func (s commonDialect) HasColumn(tableName string, columnName string) bool {
 	var count int
 	currentDatabase, tableName := currentDatabaseAndTable(&s, tableName)

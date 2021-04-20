@@ -91,9 +91,26 @@ func (s *postgres) DataTypeOf(field *StructField) string {
 	return fmt.Sprintf("%v %v", sqlType, additionalType)
 }
 
+func currentSchemaAndTable(tableName string) (string, string) {
+	if strings.Contains(tableName, ".") {
+		splitStrings := strings.SplitN(tableName, ".", 2)
+		return splitStrings[0], splitStrings[1]
+	}
+	return "", tableName
+}
+
+func GetSchemaStr(schemaName string) string {
+	if schemaName != "" {
+		return "'" + schemaName + "'"
+	} else {
+		return "CURRENT_SCHEMA()"
+	}
+}
+
 func (s postgres) HasIndex(tableName string, indexName string) bool {
+	schemaName, tableName := currentSchemaAndTable(tableName)
 	var count int
-	s.db.QueryRow("SELECT count(*) FROM pg_indexes WHERE tablename = $1 AND indexname = $2 AND schemaname = CURRENT_SCHEMA()", tableName, indexName).Scan(&count)
+	s.db.QueryRow("SELECT count(*) FROM pg_indexes WHERE tablename = $1 AND indexname = $2 AND schemaname = "+GetSchemaStr(schemaName), tableName, indexName).Scan(&count)
 	return count > 0
 }
 
@@ -104,14 +121,23 @@ func (s postgres) HasForeignKey(tableName string, foreignKeyName string) bool {
 }
 
 func (s postgres) HasTable(tableName string) bool {
+	schemaName, tableName := currentSchemaAndTable(tableName)
 	var count int
-	s.db.QueryRow("SELECT count(*) FROM INFORMATION_SCHEMA.tables WHERE table_name = $1 AND table_type = 'BASE TABLE' AND table_schema = CURRENT_SCHEMA()", tableName).Scan(&count)
+	s.db.QueryRow("SELECT count(*) FROM INFORMATION_SCHEMA.tables WHERE table_name = $1 AND table_type = 'BASE TABLE' AND table_schema = "+GetSchemaStr(schemaName), tableName).Scan(&count)
 	return count > 0
 }
 
+func (s postgres) HasSchema(tableName string) bool {
+	schemaName, _ := currentSchemaAndTable(tableName)
+
+	return schemaName == ""
+}
+
 func (s postgres) HasColumn(tableName string, columnName string) bool {
+	schemaName, tableName := currentSchemaAndTable(tableName)
+
 	var count int
-	s.db.QueryRow("SELECT count(*) FROM INFORMATION_SCHEMA.columns WHERE table_name = $1 AND column_name = $2 AND table_schema = CURRENT_SCHEMA()", tableName, columnName).Scan(&count)
+	s.db.QueryRow("SELECT count(*) FROM INFORMATION_SCHEMA.columns WHERE table_name = $1 AND column_name = $2 AND table_schema = "+GetSchemaStr(schemaName), tableName, columnName).Scan(&count)
 	return count > 0
 }
 

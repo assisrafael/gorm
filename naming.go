@@ -11,6 +11,7 @@ type Namer func(string) string
 // NamingStrategy represents naming strategies
 type NamingStrategy struct {
 	DB     Namer
+	Schema Namer
 	Table  Namer
 	Column Namer
 }
@@ -46,6 +47,11 @@ func (ns *NamingStrategy) TableName(name string) string {
 	return ns.Table(name)
 }
 
+// TableName alters the given name by Table
+func (ns *NamingStrategy) SchemaName(name string) string {
+	return ns.Schema(name)
+}
+
 // ColumnName alters the given name by Column
 func (ns *NamingStrategy) ColumnName(name string) string {
 	return ns.Column(name)
@@ -59,6 +65,11 @@ func ToDBName(name string) string {
 // ToTableName convert string to table name
 func ToTableName(name string) string {
 	return TheNamingStrategy.TableName(name)
+}
+
+// ToSchemaName convert string to schema name
+func ToSchemaName(name string) string {
+	return TheNamingStrategy.SchemaName(name)
 }
 
 // ToColumnName convert string to db name

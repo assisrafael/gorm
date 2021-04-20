@@ -308,6 +308,7 @@ type tabler interface {
 
 type dbTabler interface {
 	TableName(*DB) string
+	SchemaName(*DB) string
 }
 
 // TableName return table name
@@ -327,6 +328,18 @@ func (scope *Scope) TableName() string {
 	return scope.GetModelStruct().TableName(scope.db.Model(scope.Value))
 }
 
+// SchemaName return schema name
+func (scope *Scope) SchemaName() string {
+	tableName := scope.TableName()
+
+	if strings.Contains(tableName, ".") {
+		splitStrings := strings.SplitN(tableName, ".", 2)
+		return splitStrings[0]
+	}
+
+	return ""
+}
+
 // QuotedTableName return quoted table name
 func (scope *Scope) QuotedTableName() (name string) {
 	if scope.Search != nil && len(scope.Search.tableName) > 0 {
@@ -337,6 +350,17 @@ func (scope *Scope) QuotedTableName() (name string) {
 	}
 
 	return scope.Quote(scope.TableName())
+}
+
+func (scope *Scope) QuotedSchemaName() (name string) {
+	if scope.Search != nil && len(scope.Search.schemaName) > 0 {
+		if strings.Contains(scope.Search.schemaName, " ") {
+			return scope.Search.schemaName
+		}
+		return scope.Quote(scope.Search.schemaName)
+	}
+
+	return scope.Quote(scope.SchemaName())
 }
 
 // CombinedConditionSql return combined condition sql
@@ -1203,6 +1227,11 @@ func (scope *Scope) createTable() *Scope {
 	return scope
 }
 
+func (scope *Scope) createSchema() *Scope {
+	scope.Raw(fmt.Sprintf("CREATE SCHEMA IF NOT EXISTS %v", scope.QuotedSchemaName())).Exec()
+	return scope
+}
+
 func (scope *Scope) dropTable() *Scope {
 	scope.Raw(fmt.Sprintf("DROP TABLE %v", scope.QuotedTableName())).Exec()
 	return scope
@@ -1268,6 +1297,10 @@ func (scope *Scope) removeIndex(indexName string) {
 func (scope *Scope) autoMigrate() *Scope {
 	tableName := scope.TableName()
 	quotedTableName := scope.QuotedTableName()
+
+	if !scope.Dialect().HasSchema(tableName) {
+		scope.createSchema()
+	}
 
 	if !scope.Dialect().HasTable(tableName) {
 		scope.createTable()

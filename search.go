@@ -21,6 +21,7 @@ type search struct {
 	limit            interface{}
 	group            string
 	tableName        string
+	schemaName       string
 	raw              bool
 	Unscoped         bool
 	ignoreOrderQuery bool

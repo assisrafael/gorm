@@ -278,7 +278,7 @@ func TestTableName(t *testing.T) {
 	}
 
 	if DB.NewScope(&Cart{}).TableName() != "shopping_cart" {
-		t.Errorf("&Cart's singular table name should be shopping_cart")
+		t.Errorf("&Cart's singular table name should be 'shopping_cart' not '%v'", DB.NewScope(&Cart{}).TableName())
 	}
 
 	if DB.NewScope(Cart{}).TableName() != "shopping_cart" {

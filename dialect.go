@@ -31,6 +31,8 @@ type Dialect interface {
 	RemoveIndex(tableName string, indexName string) error
 	// HasTable check has table or not
 	HasTable(tableName string) bool
+	// HasTable check has table or not
+	HasSchema(schemaName string) bool
 	// HasColumn check has column or not
 	HasColumn(tableName string, columnName string) bool
 	// ModifyColumn modify column's type

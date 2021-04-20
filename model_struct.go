@@ -17,6 +17,10 @@ var DefaultTableNameHandler = func(db *DB, defaultTableName string) string {
 	return defaultTableName
 }
 
+var DefaultSchemaNameHandler = func(db *DB, defaultSchemaName string) string {
+	return defaultSchemaName
+}
+
 // lock for mutating global cached model metadata
 var structsLock sync.Mutex
 
