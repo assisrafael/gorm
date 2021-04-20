@@ -29,7 +29,7 @@ jobs:
         key: ${{ runner.os }}-go-${{ matrix.go }}-${{ hashFiles('go.mod') }}
 
     - name: Tests
-      run: GORM_DIALECT=sqlite ./tests_all.sh all
+      run: GORM_DIALECT=sqlite ./test_all.sh all
 
   postgres:
     strategy:
@@ -71,4 +71,4 @@ jobs:
         key: ${{ runner.os }}-go-${{ matrix.go }}-${{ hashFiles('go.mod') }}
 
     - name: Tests
-      run: GORM_DIALECT=postgres GORM_DSN="user=gorm password=gorm dbname=gorm host=localhost port=9920 sslmode=disable TimeZone=Asia/Shanghai" ./tests_all.sh all
+      run: GORM_DIALECT=postgres GORM_DSN="user=gorm password=gorm dbname=gorm host=localhost port=9920 sslmode=disable TimeZone=Asia/Shanghai" ./test_all.sh all
